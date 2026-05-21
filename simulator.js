@@ -171,6 +171,29 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- UI Utility Functions ---
+function openLogoLightbox() {
+    const lightbox = document.getElementById('logo-lightbox');
+    if (lightbox) {
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeLogoLightbox() {
+    const lightbox = document.getElementById('logo-lightbox');
+    if (lightbox) {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Add escape key handler for logo lightbox
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeLogoLightbox();
+    }
+});
+
 function addLog(text, type = "info") {
     const time = new Date().toLocaleTimeString();
     consoleLog.push({ time, text, type });
