@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Prince Simulator — a web-based Intel 8085 microprocessor emulator for engineering students. Write, compile, and execute assembly programs in your browser.">
+    <meta name="theme-color" content="#07090e">
+    <meta property="og:title" content="Prince Simulator — 8085 Microprocessor Emulator">
+    <meta property="og:description" content="Write, compile, and run 8085 assembly code in your browser. 7 lab experiments included.">
+    <meta property="og:type" content="website">
+    <title>Prince Simulator — 8085 Microprocessor Emulator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Premium Ambient Glow Blobs -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">P</div>
+            <div class="logo-text">
+                <h1>Prince Simulator</h1>
+                <p>Because the real 8085 kit is always broken</p>
+            </div>
+        </div>
+        
+        <nav class="nav-links" id="nav-links">
+            <a href="#editor-section" class="nav-link active" onclick="scrollToSection('editor-section')">Editor</a>
+            <a href="#registers-section" class="nav-link" onclick="scrollToSection('registers-section')">Registers</a>
+            <a href="#board-section" class="nav-link" onclick="scrollToSection('board-section')">Board</a>
+            <button class="nav-link nav-help-btn" onclick="toggleHelpModal()">? Help</button>
+        </nav>
+
+        <div class="header-right">
+            <div class="cpu-status-badge">
+                <span class="status-dot halted" id="status-dot"></span>
+                <span id="status-lbl">HALTED</span>
+                <span style="color: var(--text-dark); margin: 0 0.25rem;">|</span>
+                <span style="color: var(--primary); font-weight: 600;">PC: <span id="header-pc" style="font-family: var(--font-mono);">2000</span></span>
+            </div>
+        </div>
+
+        <!-- Mobile nav toggle -->
+        <button class="nav-toggle" id="nav-toggle" onclick="document.getElementById('nav-links').classList.toggle('open')" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- Main Dashboard Grid -->
+    <main>
+        
+        <!-- Left Column: Assembler IDE Editor -->
+        <section class="card" id="editor-section" style="grid-column: span 1;">
+            <div class="card-header">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                    Assembly Workspace
+                </h2>
+                <span class="register-desc">Pick an experiment, edit the code, hit Compile</span>
+            </div>
+            <div class="card-body">
+                <!-- Preset programs row -->
+                <div class="presets-container">
+                    <label for="experiment-select" class="presets-label">Lab Experiment:</label>
+                    <select id="experiment-select" class="presets-select" onchange="loadPreset(this.value)">
+                        <option value="exp1">Exp 01 — Simple 8-Bit Addition</option>
+                        <option value="exp2">Exp 02 — Sequential Storage (2400H-2402H)</option>
+                        <option value="exp3">Exp 03 — Addition with Carry (Overflow)</option>
+                        <option value="exp4">Exp 04 — 8-Bit Subtraction via 2's Comp</option>
+                        <option value="exp5">Exp 05 — Find Larger of Two Numbers</option>
+                        <option value="exp6">Exp 06 — Find Smaller of Two Numbers</option>
+                        <option value="exp7">Exp 07 — Largest in Array (Loop Counter)</option>
+                    </select>
+                </div>
+                
+                <!-- Main Text Editor Container -->
+                <div class="editor-container">
+                    <div class="line-numbers" id="line-numbers">1</div>
+                    <textarea class="code-textarea" id="code-editor" placeholder="; Write Intel 8085 Assembly here..." spellcheck="false"></textarea>
+                </div>
+                
+                <!-- Compiler Controls -->
+                <div class="editor-actions">
+                    <button class="btn btn-primary" onclick="compileCode()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                        Compile & Load
+                    </button>
+                    <button class="btn btn-danger" onclick="resetCpu()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                        </svg>
+                        Reset CPU
+                    </button>
+                </div>
+                
+                <!-- Developer Console log -->
+                <div class="console-box" id="console">
+                    <div class="console-line">
+                        <span class="console-info">Simulator ready. Load a recipe to begin.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Middle Column: Registers & CPU Architecture -->
+        <section class="card" id="registers-section">
+            <div class="card-header">
+                <h2>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect>
+                        <path d="M7 2v20M17 2v20M2 12h20"></path>
+                    </svg>
+                    Registers &amp; Flags
+                </h2>
+                <div class="memory-actions">
+                    <label style="font-size: 0.7rem; color: var(--text-muted); cursor: pointer;">
+                        Speed:
+                        <input type="range" min="1" max="999" value="900" style="width: 70px; vertical-align: middle;" oninput="setExecutionSpeed(this.value)">
+                    </label>
+                </div>
+            </div>
+            
+            <div class="card-body" style="gap: 1.25rem;">
+                
+                <!-- Debug execution controls -->
+                <div class="editor-actions" style="margin-bottom: 0.25rem;">
+                    <button class="btn btn-secondary" onclick="runSimulation()">
+                        Run
+                    </button>
+                    <button class="btn btn-accent" onclick="stopSimulation()">
+                        Pause
+                    </button>
+                    <button class="btn btn-accent" onclick="stepExecution()">
+                        Step
+                    </button>
+                </div>
+
+                <!-- Accumulator Register -->
+                <div class="register-card accumulator">
+                    <div class="register-info">
+                        <span class="register-name">Accumulator (A)</span>
+                        <span class="register-desc">Core Arithmetic Register</span>
+                    </div>
+                    <div class="register-value">
+                        <span id="reg-a">00</span>
+                        <span class="register-bin" id="reg-a-bin">00000000</span>
+                    </div>
+                </div>
+
+                <!-- Status Flags Panel -->
+                <div class="flags-row">
+                    <div class="flag-box" id="flag-s">
+                        <span class="flag-name">S</span>
+                        <span class="flag-bit">0</span>
+                        <span class="flag-lbl">Sign</span>
+                    </div>
+                    <div class="flag-box" id="flag-z">
+                        <span class="flag-name">Z</span>
+                        <span class="flag-bit">0</span>
+                        <span class="flag-lbl">Zero</span>
+                    </div>
+                    <div class="flag-box" id="flag-ac">
+                        <span class="flag-name">AC</span>
+                        <span class="flag-bit">0</span>
+                        <span class="flag-lbl">Aux. C</span>
+                    </div>
+                    <div class="flag-box" id="flag-p">
+                        <span class="flag-name">P</span>
+                        <span class="flag-bit">0</span>
+                        <span class="flag-lbl">Parity</span>
+                    </div>
+                    <div class="flag-box" id="flag-cy">
+                        <span class="flag-name">CY</span>
+                        <span class="flag-bit">0</span>
+                        <span class="flag-lbl">Carry</span>
+                    </div>
+                </div>
+
+                <!-- General Purpose registers B, C, D, E, H, L -->
+                <div class="registers-grid">
+                    <div class="register-card pair">
+                        <div class="register-info">
+                            <span class="register-name">B</span>
+                            <span class="register-desc">General Purpose</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-b">00</span>
+                            <span class="register-bin" id="reg-b-bin">00000000</span>
+                        </div>
+                    </div>
+                    <div class="register-card pair">
+                        <div class="register-info">
+                            <span class="register-name">C</span>
+                            <span class="register-desc">General Purpose</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-c">00</span>
+                            <span class="register-bin" id="reg-c-bin">00000000</span>
+                        </div>
+                    </div>
+                    <div class="register-card pair">
+                        <div class="register-info">
+                            <span class="register-name">D</span>
+                            <span class="register-desc">General Purpose</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-d">00</span>
+                            <span class="register-bin" id="reg-d-bin">00000000</span>
+                        </div>
+                    </div>
+                    <div class="register-card pair">
+                        <div class="register-info">
+                            <span class="register-name">E</span>
+                            <span class="register-desc">General Purpose</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-e">00</span>
+                            <span class="register-bin" id="reg-e-bin">00000000</span>
+                        </div>
+                    </div>
+                    <div class="register-card pair">
+                        <div class="register-info">
+                            <span class="register-name">H</span>
+                            <span class="register-desc">HL Memory High</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-h">00</span>
+                            <span class="register-bin" id="reg-h-bin">00000000</span>
+                        </div>
+                    </div>
+                    <div class="register-card pair">
+                        <div class="register-info">
+                            <span class="register-name">L</span>
+                            <span class="register-desc">HL Memory Low</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-l">00</span>
+                            <span class="register-bin" id="reg-l-bin">00000000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Special 16-bit register pointers -->
+                <div class="flow-grid">
+                    <div class="register-card" style="border-left-color: var(--primary);">
+                        <div class="register-info">
+                            <span class="register-name">Program Counter (PC)</span>
+                            <span class="register-desc">Next Instruction</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-pc" style="font-size: 1.25rem;">2000</span>
+                        </div>
+                    </div>
+                    <div class="register-card" style="border-left-color: var(--primary);">
+                        <div class="register-info">
+                            <span class="register-name">Stack Pointer (SP)</span>
+                            <span class="register-desc">Call/Push Pointer</span>
+                        </div>
+                        <div class="register-value">
+                            <span id="reg-sp" style="font-size: 1.25rem;">FFFF</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Interactive panels -->
+        <section class="card right-col" id="board-section">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="memory" onclick="switchTab('memory')">Memory Table</button>
+                <button class="tab-btn" data-tab="trainer" onclick="switchTab('trainer')">Trainer Board Kit</button>
+            </div>
+            
+            <div class="card-body">
+                
+                <!-- Tab 1: Memory table -->
+                <div class="tab-content active" id="memory-tab">
+                    <div class="memory-actions">
+                        <input type="text" class="mem-search-input" id="memory-search" placeholder="Go to (e.g. 3000H)" value="2000H">
+                        <button class="btn btn-accent" style="padding: 0.4rem 0.8rem; flex: 0;" onclick="searchMemory()">Find</button>
+                        <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; flex: 0; background: rgba(239, 68, 68, 0.05);" onclick="clearMemory()">Clear</button>
+                    </div>
+                    
+                    <div class="memory-table-container">
+                        <table class="memory-table">
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Hex Byte</th>
+                                    <th>Decimal</th>
+                                    <th>Instruction Preview</th>
+                                </tr>
+                            </thead>
+                            <tbody id="memory-table-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="editor-actions">
+                        <button class="btn btn-accent" onclick="shiftMemoryView(-10)">◀ Scroll Up</button>
+                        <button class="btn btn-accent" onclick="shiftMemoryView(10)">Scroll Down ▶</button>
+                    </div>
+                </div>
+                
+                <!-- Tab 2: Trainer Kit Board -->
+                <div class="tab-content" id="trainer-tab">
+                    
+                    <!-- Fullscreen toggle -->
+                    <div class="trainer-toolbar">
+                        <span class="trainer-toolbar-hint">Use your keyboard — just like the real lab kit</span>
+                        <button class="btn btn-accent fullscreen-btn" id="fullscreen-toggle" onclick="toggleTrainerFullscreen()" title="Toggle Fullscreen">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+                            Fullscreen
+                        </button>
+                    </div>
+
+                    <!-- High-Fidelity Green PCB Board sitting on a Neumorphic Workbench -->
+                    <div class="pcb-container">
+                        <div class="pcb-board" id="pcb-board-element">
+                            <!-- Solder Joint Corners (Mounting holes) -->
+                            <div class="pcb-mount mount-tl"></div>
+                            <div class="pcb-mount mount-tr"></div>
+                            <div class="pcb-mount mount-bl"></div>
+                            <div class="pcb-mount mount-br"></div>
+
+                            <!-- Board Silk Screen Title -->
+                            <div class="pcb-title">8085 MICROPROCESSOR KIT</div>
+                            <div class="pcb-sub-title">PRINCE SIMULATION LABS &mdash; REV 2.1</div>
+                            
+                            <!-- Copper Tracks Background Detail -->
+                            <div class="pcb-tracks"></div>
+                            
+                            <!-- 16x2 Character Backlit Green LCD Display (Center-Top) -->
+                            <div class="lcd-module">
+                                <div class="lcd-bezel"></div>
+                                <div class="lcd-screen" id="lcd-display">
+                                    <div class="lcd-line lcd-line-1">ADDR: <span id="lcd-addr">2000</span>  DATA: <span id="lcd-data">00</span></div>
+                                    <div class="lcd-line lcd-line-2" id="lcd-status">MODE: ADDR ENTRY</div>
+                                </div>
+                                <div class="lcd-screws">
+                                    <span class="screw screw-tl"></span>
+                                    <span class="screw screw-tr"></span>
+                                    <span class="screw screw-bl"></span>
+                                    <span class="screw screw-br"></span>
+                                </div>
+                                <div class="lcd-header-pins"></div>
+                            </div>
+                            
+                            <!-- On-board status LEDs (top right of board) -->
+                            <div class="pcb-leds-panel">
+                                <div class="pcb-led-group">
+                                    <span class="pcb-led led-green active" id="led-pwr"></span>
+                                    <span class="pcb-led-lbl">PWR</span>
+                                </div>
+                                <div class="pcb-led-group">
+                                    <span class="pcb-led led-amber" id="led-run"></span>
+                                    <span class="pcb-led-lbl">RUN</span>
+                                </div>
+                                <div class="pcb-led-group">
+                                    <span class="pcb-led led-red" id="led-hlt"></span>
+                                    <span class="pcb-led-lbl">HLT</span>
+                                </div>
+                                <div class="pcb-led-group">
+                                    <span class="pcb-led led-cyan" id="led-cy"></span>
+                                    <span class="pcb-led-lbl">CY</span>
+                                </div>
+                            </div>
+
+                            <!-- Silk screen component labels & outlines -->
+                            <div class="silk-labels">
+                                <span class="silk-lbl label-cn3" style="top: 8px; left: 15px;">CN3</span>
+                                <span class="silk-lbl label-cn2" style="top: 38px; left: 3px;">CN2</span>
+                                <span class="silk-lbl label-u1" style="top: 38px; left: 62px;">U1 8253</span>
+                                <span class="silk-lbl label-u8" style="top: 130px; left: 62px;">U8 8085</span>
+                                <span class="silk-lbl label-cn1" style="top: 250px; left: 3px;">CN1</span>
+                                
+                                <span class="silk-lbl label-mem" style="top: 84px; left: 160px;">MEM1</span>
+                                <span class="silk-lbl label-mem2" style="top: 84px; left: 230px;">MEM2</span>
+                                <span class="silk-lbl label-cap" style="top: 120px; left: 245px;">C7</span>
+                                <span class="silk-lbl label-xtal" style="top: 122px; left: 105px;">X-TAL</span>
+                                <span class="silk-lbl label-cn8" style="top: 255px; left: 180px;">CN8 (Bus)</span>
+                                
+                                <span class="silk-lbl label-cn5" style="top: 8px; right: 40px;">CN5</span>
+                                <span class="silk-lbl label-cn9" style="top: 38px; right: 10px;">CN9</span>
+                                <span class="silk-lbl label-u9" style="top: 130px; right: 65px;">U9 8255</span>
+                            </div>
+
+                            <!-- Integrated Electronic Components (styled completely in CSS) -->
+                            <div class="pcb-components">
+                                <!-- Black headers / Pin sockets -->
+                                <!-- CN3 top left (8 pin socket) -->
+                                <div class="header-socket socket-horizontal" style="top: 18px; left: 12px; width: 45px; height: 10px;" title="CN3 (Power Header)">
+                                    <span class="socket-pins pin-count-8"></span>
+                                </div>
+                                <div class="silk-outline" style="top: 15px; left: 9px; width: 51px; height: 16px;"></div>
+
+                                <!-- CN2 vertical left (26-pin socket) -->
+                                <div class="header-socket socket-vertical" style="top: 48px; left: 12px; width: 12px; height: 75px;" title="CN2 Input Connector">
+                                    <span class="socket-pins pin-count-26"></span>
+                                </div>
+                                <div class="silk-outline" style="top: 45px; left: 9px; width: 18px; height: 81px;"></div>
+
+                                <!-- CN1 vertical bottom-left (40-pin socket) -->
+                                <div class="header-socket socket-vertical" style="top: 140px; left: 12px; width: 12px; height: 110px;" title="CN1 Bus Connector">
+                                    <span class="socket-pins pin-count-40"></span>
+                                </div>
+                                <div class="silk-outline" style="top: 137px; left: 9px; width: 18px; height: 116px;"></div>
+
+                                <!-- U1: 8253 Timer/Counter (top left vertical 24-pin DIP chip) -->
+                                <div class="chip chip-vertical" style="top: 48px; left: 38px; width: 22px; height: 75px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-24"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.38rem;">NEC 8253</span>
+                                </div>
+                                <div class="silk-outline" style="top: 45px; left: 34px; width: 30px; height: 81px;"></div>
+                                
+                                <!-- U8: 8085 CPU (middle left vertical 40-pin DIP chip) -->
+                                <div class="chip chip-vertical core-cpu" style="top: 140px; left: 38px; width: 24px; height: 110px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-40"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.44rem; font-weight: 800;">NEC 8085A CPU</span>
+                                </div>
+                                <div class="silk-outline" style="top: 137px; left: 34px; width: 32px; height: 116px;"></div>
+
+                                <!-- U2, U3: Small logic gates in middle-left (74LS04, 74LS138) -->
+                                <div class="chip chip-vertical mini-chip" style="top: 185px; left: 74px; width: 15px; height: 42px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-14"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.3rem;">74LS04</span>
+                                </div>
+                                <div class="chip chip-vertical mini-chip" style="top: 235px; left: 74px; width: 15px; height: 42px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-16"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.3rem;">74LS138</span>
+                                </div>
+
+                                <!-- Quartz Crystal (X-TAL 1) silver container -->
+                                <div class="xtal-oscillator" style="top: 130px; left: 70px;">3.07 MHz</div>
+                                
+                                <!-- Horizontal MEM1 and MEM2 chips under LCD -->
+                                <div class="chip chip-horizontal" style="top: 94px; left: 140px; width: 55px; height: 18px;">
+                                    <span class="chip-notch-left"></span>
+                                    <span class="chip-pins-top-bottom pin-count-28"></span>
+                                    <span class="chip-text" style="font-size: 0.32rem;">MEM1 (EPROM)</span>
+                                </div>
+                                <div class="chip chip-horizontal" style="top: 94px; left: 205px; width: 55px; height: 18px;">
+                                    <span class="chip-notch-left"></span>
+                                    <span class="chip-pins-top-bottom pin-count-28"></span>
+                                    <span class="chip-text" style="font-size: 0.32rem;">MEM2 (RAM)</span>
+                                </div>
+
+                                <!-- Big Blue Cylindrical Decoupling Capacitor C7 (horizontal) -->
+                                <div class="cap-cylindrical horizontal" style="top: 122px; left: 165px; width: 45px; height: 18px;">
+                                    <span class="cap-stripe"></span>
+                                    <span class="cap-labels">4700µF 16V</span>
+                                </div>
+
+                                <!-- Center logic chips (74LS244, 74LS244, 74LS245, 74LS373) vertically oriented -->
+                                <div class="chip chip-vertical mini-chip" style="top: 155px; left: 145px; width: 16px; height: 48px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-20"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.32rem;">74LS244</span>
+                                </div>
+                                <div class="chip chip-vertical mini-chip" style="top: 155px; left: 175px; width: 16px; height: 48px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-20"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.32rem;">74LS244</span>
+                                </div>
+                                <div class="chip chip-vertical mini-chip" style="top: 155px; left: 205px; width: 16px; height: 48px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-20"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.32rem;">74LS245</span>
+                                </div>
+                                <div class="chip chip-vertical mini-chip" style="top: 155px; left: 235px; width: 16px; height: 48px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-20"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.32rem;">74LS373</span>
+                                </div>
+
+                                <!-- CN8: Bus Keyboard Connector (bottom center horizontal 40-pin) -->
+                                <div class="header-socket socket-horizontal" style="top: 235px; left: 135px; width: 130px; height: 12px;" title="CN8 (Bus Keyboard Connector)">
+                                    <span class="socket-pins pin-count-40"></span>
+                                </div>
+                                <div class="silk-outline" style="top: 232px; left: 131px; width: 138px; height: 18px;"></div>
+
+                                <!-- CN5 top right (10 pin horizontal header) -->
+                                <div class="header-socket socket-horizontal" style="top: 18px; right: 25px; width: 55px; height: 10px;" title="CN5 Header">
+                                    <span class="socket-pins pin-count-10"></span>
+                                </div>
+                                <div class="silk-outline" style="top: 15px; right: 22px; width: 61px; height: 16px;"></div>
+
+                                <!-- CN9 vertical right (26-pin socket) -->
+                                <div class="header-socket socket-vertical" style="top: 48px; right: 12px; width: 12px; height: 75px;" title="CN9 Input Connector">
+                                    <span class="socket-pins pin-count-26"></span>
+                                </div>
+                                <div class="silk-outline" style="top: 45px; right: 9px; width: 18px; height: 81px;"></div>
+
+                                <!-- U9: 8255 PPI chip (right vertical 40-pin DIP chip) -->
+                                <div class="chip chip-vertical" style="top: 48px; right: 38px; width: 24px; height: 110px;">
+                                    <span class="chip-notch-top"></span>
+                                    <span class="chip-pins-left-right pin-count-40"></span>
+                                    <span class="chip-text rotate-text" style="font-size: 0.38rem; font-weight: 600;">8255 (24 I/O)</span>
+                                </div>
+                                <div class="silk-outline" style="top: 45px; right: 34px; width: 32px; height: 116px;"></div>
+
+                                <!-- Black circular ports (Keyboard Jack CN7 & Power Barrel Connector) -->
+                                <div class="black-port port-circular" style="top: 175px; right: 10px; width: 26px; height: 26px;" title="Keyboard Port Connection">
+                                    <span class="port-inner-pin"></span>
+                                </div>
+                                <div class="black-port port-barrel" style="top: 220px; right: 8px; width: 22px; height: 18px;" title="Power Barrel Jack">
+                                    <span class="barrel-inner"></span>
+                                </div>
+                                
+                                <div class="resistor res-1" style="top: 100px; left: 105px; transform: rotate(90deg);"></div>
+                                <div class="resistor res-2" style="top: 110px; left: 105px; transform: rotate(90deg);"></div>
+                                <div class="resistor res-3" style="top: 115px; left: 125px;"></div>
+                            </div>
+                            
+                            <!-- On-board small tactile buttons at the bottom-right -->
+                            <div class="pcb-buttons">
+                                <div class="pcb-tactile-btn" id="pcb-btn-vcc">
+                                    <span class="tactile-cap black-cap"></span>
+                                    <span class="tactile-lbl">VGT</span>
+                                </div>
+                                <div class="pcb-tactile-btn" id="pcb-btn-reset" onclick="onTrainerKey('RESET')">
+                                    <span class="tactile-cap red-cap"></span>
+                                    <span class="tactile-lbl">RESET</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tactile Neumorphic Command Console (Below the PCB Board) -->
+                    <div class="neumorphic-console-bar">
+                        <button class="console-btn btn-reset" id="console-btn-RESET" onclick="onTrainerKey('RESET')" title="Hardware System Reset (Shortcut: R / Esc)">
+                            <span class="btn-cap">RESET</span>
+                            <kbd>R</kbd>
+                        </button>
+                        <button class="console-btn btn-exmem" id="console-btn-EXMEM" onclick="onTrainerKey('EXMEM')" title="Substitute Memory Address (Shortcut: M)">
+                            <span class="btn-cap">EXMEM</span>
+                            <kbd>M</kbd>
+                        </button>
+                        <button class="console-btn btn-data" id="console-btn-DATA_REG" onclick="onTrainerKey('DATA_REG')" title="Edit Memory Cell Data (Shortcut: D)">
+                            <span class="btn-cap">DATA REG</span>
+                            <kbd>D</kbd>
+                        </button>
+                        <button class="console-btn btn-exreg" id="console-btn-EXREG" onclick="onTrainerKey('EXREG')" title="Examine Register Values (Shortcut: E)">
+                            <span class="btn-cap">EXREG</span>
+                            <kbd>E</kbd>
+                        </button>
+                        <button class="console-btn btn-nav" id="console-btn-PREV" onclick="onTrainerKey('PREV')" title="Previous Address (Shortcut: Backspace / Left Arrow)">
+                            <span class="btn-cap">PREV</span>
+                            <kbd>←</kbd>
+                        </button>
+                        <button class="console-btn btn-nav" id="console-btn-NEXT" onclick="onTrainerKey('NEXT')" title="Next Address (Shortcut: Enter / Right Arrow)">
+                            <span class="btn-cap">NEXT</span>
+                            <kbd>→</kbd>
+                        </button>
+                        <button class="console-btn btn-step" id="console-btn-STEP" onclick="onTrainerKey('STEP')" title="Single Step Cycle (Shortcut: S / T)">
+                            <span class="btn-cap">STEP</span>
+                            <kbd>S</kbd>
+                        </button>
+                        <button class="console-btn btn-go" id="console-btn-GO" onclick="onTrainerKey('GO')" title="Execute compiled program (Shortcut: G / Space)">
+                            <span class="btn-cap">GO</span>
+                            <kbd>G</kbd>
+                        </button>
+                    </div>
+
+                    <!-- Workbench Interface Guide Cheat-sheet -->
+                    <div class="workbench-guide">
+                        <div class="guide-header">Keyboard Shortcuts — so you don't have to click like a caveman</div>
+                        <div class="guide-grid">
+                            <div class="guide-item"><kbd>0</kbd>-<kbd>F</kbd> <span>Type Hex values directly on your computer keyboard</span></div>
+                            <div class="guide-item"><kbd>Enter</kbd> / <kbd>→</kbd> <span>NEXT (Save & Increment Address)</span></div>
+                            <div class="guide-item"><kbd>Backspace</kbd> / <kbd>←</kbd> <span>PREV (Save & Decrement Address)</span></div>
+                            <div class="guide-item"><kbd>M</kbd> <span>EXMEM (Starts address entry mode)</span></div>
+                            <div class="guide-item"><kbd>D</kbd> <span>DATA REG (Starts data edit mode)</span></div>
+                            <div class="guide-item"><kbd>E</kbd> <span>EXREG (Inspects registers A-F, H, L)</span></div>
+                            <div class="guide-item"><kbd>G</kbd> / <kbd>Space</kbd> <span>GO (Runs code at address)</span></div>
+                            <div class="guide-item"><kbd>S</kbd> / <kbd>T</kbd> <span>STEP (Steps next instruction)</span></div>
+                            <div class="guide-item"><kbd>R</kbd> / <kbd>Esc</kbd> <span>RESET (Restores system state)</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- Help / Instructions Modal -->
+    <div class="help-modal-overlay" id="help-modal" onclick="if(event.target===this)toggleHelpModal()">
+        <div class="help-modal">
+            <div class="help-modal-header">
+                <h2>How to Use Prince Simulator</h2>
+                <button class="help-close-btn" onclick="toggleHelpModal()">&times;</button>
+            </div>
+            <div class="help-modal-body">
+                <div class="help-section">
+                    <h3>Getting Started</h3>
+                    <ol>
+                        <li><strong>Pick an experiment</strong> from the dropdown in the Editor panel</li>
+                        <li>Click <strong>Compile &amp; Load</strong> to assemble the code into memory</li>
+                        <li>Hit <strong>Run</strong> to execute, or <strong>Step</strong> to go one instruction at a time</li>
+                        <li>Check the <strong>Registers</strong> panel to see CPU state changes in real-time</li>
+                        <li>Use the <strong>Memory Table</strong> to inspect and edit raw memory bytes</li>
+                    </ol>
+                </div>
+                <div class="help-section">
+                    <h3>The Trainer Board</h3>
+                    <p>This is a digital twin of the physical 8085 lab kit. Switch to the <strong>Trainer Board Kit</strong> tab and use your keyboard exactly like you would in the lab:</p>
+                    <ul>
+                        <li><strong>M</strong> &mdash; Enter address mode (type a 4-digit hex address)</li>
+                        <li><strong>D</strong> &mdash; Switch to data entry (type hex byte values)</li>
+                        <li><strong>Enter / Arrow Right</strong> &mdash; Save and move to next address</li>
+                        <li><strong>Backspace / Arrow Left</strong> &mdash; Go back one address</li>
+                        <li><strong>G</strong> &mdash; Execute program starting from current address</li>
+                        <li><strong>S</strong> &mdash; Single-step one instruction</li>
+                        <li><strong>E</strong> &mdash; Examine register values (then press A-F, H, L)</li>
+                        <li><strong>R / Esc</strong> &mdash; Hardware reset</li>
+                    </ul>
+                </div>
+                <div class="help-section">
+                    <h3>Typical Lab Workflow</h3>
+                    <ol>
+                        <li>Switch to Trainer Board tab</li>
+                        <li>Press <kbd>M</kbd> and type <code>2000</code> to set the start address</li>
+                        <li>Press <kbd>D</kbd> to enter data mode</li>
+                        <li>Type your opcode bytes one by one, pressing <kbd>Enter</kbd> after each</li>
+                        <li>When done, press <kbd>M</kbd> again, type the start address</li>
+                        <li>Press <kbd>G</kbd> twice to execute</li>
+                        <li>Press <kbd>E</kbd> then <kbd>A</kbd> to check the Accumulator result</li>
+                    </ol>
+                </div>
+                <div class="help-section">
+                    <h3>Experiments Quick Reference</h3>
+                    <table class="help-table">
+                        <thead><tr><th>#</th><th>Name</th><th>What to Check</th></tr></thead>
+                        <tbody>
+                            <tr><td>01</td><td>Simple Addition</td><td>Memory 3000H = 0DH</td></tr>
+                            <tr><td>02</td><td>Sequential Storage</td><td>Pre-set 2400H &amp; 2401H, check 2402H</td></tr>
+                            <tr><td>03</td><td>Addition with Carry</td><td>3000H = sum, 3001H = carry</td></tr>
+                            <tr><td>04</td><td>Subtraction</td><td>Memory 3000H = 1BH</td></tr>
+                            <tr><td>05</td><td>Find Larger</td><td>3000H = larger of two</td></tr>
+                            <tr><td>06</td><td>Find Smaller</td><td>3000H = smaller of two</td></tr>
+                            <tr><td>07</td><td>Largest in Array</td><td>3100H = F5H (the max)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="help-section">
+                    <h3>Pro Tips</h3>
+                    <ul>
+                        <li>The Fullscreen button in the Trainer tab gives you an immersive experience</li>
+                        <li>Use the Speed slider in the Registers panel to slow down execution for debugging</li>
+                        <li>The console log at the bottom of the Editor tracks every action</li>
+                        <li>Memory cells are editable &mdash; click any hex byte in the Memory Table to change it</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <span class="footer-brand">Prince Simulator</span>
+                <span class="footer-sep">&middot;</span>
+                <span class="footer-desc">Intel 8085 Microprocessor Emulator</span>
+            </div>
+            <div class="footer-right">
+                <a href="https://github.com/useriswild7099/PRINCE-SIMULATOR" target="_blank" rel="noopener" class="footer-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    GitHub
+                </a>
+                <span class="footer-sep">&middot;</span>
+                <span class="footer-copy">Built for students, by a student</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive notification container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="simulator.js"></script>
+</body>
+</html>

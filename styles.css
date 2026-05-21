@@ -1,0 +1,2546 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&family=Orbitron:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+    /* Cyber Obsidian Color Palette */
+    --bg-dark: #07090e;
+    --bg-workbench: #0b0e14;
+    --bg-card: rgba(16, 21, 33, 0.6);
+    --border-color: rgba(255, 255, 255, 0.05);
+    --border-focus: rgba(99, 102, 241, 0.4);
+    
+    /* 3D Shadows & Depth */
+    --shadow-card: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-inset: inset 6px 6px 12px #040508, inset -6px -6px 12px #101622;
+    --shadow-btn-convex: 5px 5px 10px #040508, -5px -5px 10px #101622;
+    --shadow-btn-inset: inset 4px 4px 8px #040508, inset -4px -4px 8px #101622;
+    
+    /* Neon Glow Accents */
+    --primary: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.3);
+    --secondary: #14b8a6;
+    --secondary-glow: rgba(20, 184, 166, 0.3);
+    --accent: #00f2fe;
+    --accent-glow: rgba(0, 242, 254, 0.3);
+    
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    
+    /* Typography System */
+    --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-heading: 'Syne', sans-serif;
+    --font-instrument: 'Orbitron', monospace;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-dark: #475569;
+    
+    --transition-speed: 0.25s;
+    --blur-strength: 16px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Premium Background Ambient Glow Circles */
+.ambient-glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.12;
+    z-index: -2;
+    pointer-events: none;
+    transition: all 1s ease-in-out;
+}
+.glow-1 {
+    width: 500px;
+    height: 500px;
+    background: var(--primary);
+    top: -10%;
+    left: -5%;
+}
+.glow-2 {
+    width: 600px;
+    height: 600px;
+    background: var(--secondary);
+    bottom: -10%;
+    right: -5%;
+}
+.glow-3 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent);
+    top: 35%;
+    left: 45%;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: all var(--transition-speed);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.4);
+}
+
+/* Sleek Glassmorphism Header */
+header {
+    background: rgba(7, 9, 14, 0.7);
+    backdrop-filter: blur(var(--blur-strength));
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.9rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.45);
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: white;
+}
+
+.logo-text h1 {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff, #c7d2fe, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.logo-text p {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.cpu-status-badge {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    padding: 0.45rem 1rem;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-instrument);
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    box-shadow: inset 1px 1px 3px rgba(255, 255, 255, 0.02);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--text-dark);
+}
+.status-dot.running {
+    background-color: var(--secondary);
+    box-shadow: 0 0 10px var(--secondary);
+    animation: pulse 1.5s infinite;
+}
+.status-dot.halted {
+    background-color: var(--danger);
+    box-shadow: 0 0 10px var(--danger);
+}
+.status-dot.idle {
+    background-color: var(--warning);
+    box-shadow: 0 0 10px var(--warning);
+}
+
+/* Master Layout Grid - Completely Fluid & Responsive */
+main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    max-width: 1800px;
+    width: 100%;
+    margin: 0 auto;
+    z-index: 10;
+}
+
+@media (max-width: 1380px) {
+    main {
+        grid-template-columns: 1.2fr 1fr;
+    }
+    .right-col {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 1024px) {
+    main {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+    .right-col {
+        grid-column: span 1;
+    }
+}
+
+/* Premium Glassmorphic Cards */
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--blur-strength));
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform var(--transition-speed), border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+.card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+}
+
+.card-header {
+    padding: 1.1rem 1.35rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.card-header h2 {
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-main);
+    letter-spacing: 0.3px;
+}
+.card-header h2 svg {
+    color: var(--primary);
+}
+
+.card-body {
+    padding: 1.35rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+/* Premium Code Editor IDE */
+.presets-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.presets-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.presets-select {
+    background: rgba(7, 9, 14, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.65rem 0.9rem;
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 1px 1px 2px rgba(255,255,255,0.02), 0 4px 10px rgba(0,0,0,0.3);
+    transition: all var(--transition-speed);
+}
+.presets-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.editor-container {
+    position: relative;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    min-height: 420px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+    background: #06090e;
+}
+.editor-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--primary), transparent);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.line-numbers {
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--text-dark);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    padding: 1.1rem 0.6rem;
+    text-align: right;
+    user-select: none;
+    border-right: 1px solid var(--border-color);
+    min-width: 44px;
+    line-height: 1.6;
+}
+
+.code-textarea {
+    flex: 1;
+    background: transparent;
+    color: #e2e8f0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 1.1rem;
+    border: none;
+    outline: none;
+    resize: none;
+    line-height: 1.6;
+    tab-size: 4;
+    caret-color: var(--primary);
+}
+.code-textarea::selection {
+    background: rgba(99, 102, 241, 0.3);
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(99, 102, 241, 0.8);
+}
+.code-textarea::placeholder {
+    color: var(--text-dark);
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.85rem;
+}
+
+/* Cybernetic Action Buttons */
+.btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.72rem 1.1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+    color: white;
+    box-shadow: 0 8px 20px var(--primary-glow);
+}
+.btn-primary:hover {
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--secondary) 0%, #0d9488 100%);
+    color: white;
+    box-shadow: 0 8px 20px var(--secondary-glow);
+}
+.btn-secondary:hover {
+    box-shadow: 0 10px 25px rgba(20, 184, 166, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-accent {
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-main);
+}
+.btn-accent:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-danger {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+.btn-danger:hover {
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Interactive Developer Log Console */
+.console-box {
+    background: rgba(4, 5, 8, 0.7);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    height: 120px;
+    padding: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    overflow-y: auto;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.console-line {
+    margin-bottom: 0.45rem;
+    display: flex;
+    gap: 0.6rem;
+}
+
+.console-time {
+    color: var(--text-dark);
+}
+.console-info { color: var(--accent); }
+.console-success { color: var(--success); }
+.console-error { color: #f87171; }
+.console-warn { color: var(--warning); }
+
+/* Retro Nixie-Tube Segment Registers Grid */
+.registers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+}
+
+.register-card {
+    background: rgba(5, 7, 12, 0.75);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 0.85rem 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.02), 0 10px 20px rgba(0,0,0,0.3);
+    transition: all var(--transition-speed);
+}
+.register-card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.04), 0 12px 25px rgba(0,0,0,0.4);
+}
+.register-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15%;
+    bottom: 15%;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: var(--primary);
+}
+.register-card.accumulator::before { background: var(--accent); }
+.register-card.pair::before { background: var(--secondary); }
+
+.register-info {
+    display: flex;
+    flex-direction: column;
+}
+.register-name {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+.register-desc {
+    font-size: 0.6rem;
+    color: var(--text-dark);
+}
+
+.register-value {
+    font-family: var(--font-instrument);
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: #ffb703; /* Vintage hardware orange glow */
+    text-shadow: 0 0 8px rgba(255, 183, 3, 0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.register-bin {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text-dark);
+    margin-top: 0.15rem;
+}
+
+.register-card.accumulator .register-value {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.55);
+}
+.register-card.pair .register-value {
+    color: var(--secondary);
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.45);
+}
+
+/* Flash Glow Transition Effect */
+@keyframes flash-amber {
+    0% { background-color: rgba(255, 183, 3, 0.25); }
+    100% { background-color: transparent; }
+}
+.flash-change {
+    animation: flash-amber 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.flags-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+.flag-box {
+    background: rgba(5, 7, 12, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.6rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    transition: all var(--transition-speed);
+}
+.flag-box.active {
+    background: var(--secondary-glow);
+    border-color: var(--secondary);
+    box-shadow: 0 0 12px rgba(20, 184, 166, 0.35);
+}
+
+.flag-name {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-muted);
+}
+.flag-box.active .flag-name {
+    color: var(--secondary);
+}
+
+.flag-bit {
+    font-family: var(--font-instrument);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+.flag-box.active .flag-bit {
+    color: var(--text-main);
+    text-shadow: 0 0 6px var(--secondary);
+}
+
+.flag-lbl {
+    font-size: 0.52rem;
+    color: var(--text-dark);
+    text-transform: uppercase;
+}
+
+.flow-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+}
+
+/* Interactive Tabs for Right Column panels */
+.tabs-header {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.4rem;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 0.8rem 1.4rem;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition-speed);
+}
+.tab-btn:hover {
+    color: var(--text-main);
+}
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+/* Sleek Memory Table Panel */
+.memory-table-container {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 260px;
+    overflow-y: auto;
+    background: rgba(4, 5, 8, 0.45);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.memory-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    text-align: left;
+}
+
+.memory-table th, .memory-table td {
+    padding: 0.55rem 0.9rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.memory-table th {
+    background: rgba(7, 9, 14, 0.85);
+    color: var(--text-muted);
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 0 var(--border-color);
+}
+
+.memory-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+.memory-row.active-pc {
+    background: var(--primary-glow);
+    color: var(--primary);
+}
+
+.mem-cell-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    color: var(--accent);
+    font-family: var(--font-instrument);
+    font-weight: 800;
+    width: 40px;
+    text-align: center;
+    border-radius: 6px;
+    outline: none;
+    padding: 0.15rem 0;
+    transition: all var(--transition-speed);
+}
+.mem-cell-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* HIGH-FIDELITY GREEN PCB DIGITAL TWIN */
+.pcb-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 1.2rem 0;
+    overflow: visible; /* Prevent scale boundary clipping */
+}
+
+.pcb-board {
+    width: 100%;
+    max-width: 460px;
+    height: 290px;
+    background: radial-gradient(circle at 50% 50%, #063d1e 0%, #03200e 100%);
+    border: 4px solid #14a050;
+    border-radius: 14px;
+    box-shadow: 
+        0 20px 45px rgba(0, 0, 0, 0.75),
+        inset 0 0 40px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(20, 160, 80, 0.15);
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5;
+    transform-origin: center center;
+}
+
+/* Solder mounting holes */
+.pcb-mount {
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle, #555 0%, #888 35%, #bbb 50%, #444 80%, #111 100%);
+    border-radius: 50%;
+    position: absolute;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+.mount-tl { top: 8px; left: 8px; }
+.mount-tr { top: 8px; right: 8px; }
+.mount-bl { bottom: 8px; left: 8px; }
+.mount-br { bottom: 8px; right: 8px; }
+
+.pcb-title {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.75);
+    text-shadow: 0 1px 0.5px rgba(0,0,0,0.6);
+    letter-spacing: 0.5px;
+    position: absolute;
+    bottom: 24px;
+    left: 120px;
+    z-index: 5;
+}
+.pcb-sub-title {
+    font-family: var(--font-instrument);
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 1px;
+    position: absolute;
+    bottom: 12px;
+    left: 120px;
+    z-index: 5;
+}
+
+/* Pulsing Active Copper PCB Tracks */
+.pcb-tracks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(45deg, rgba(207, 181, 59, 0.02) 0px, rgba(207, 181, 59, 0.02) 2px, transparent 2px, transparent 15px), 
+        repeating-linear-gradient(-45deg, rgba(207, 181, 59, 0.015) 0px, rgba(207, 181, 59, 0.015) 1px, transparent 1px, transparent 20px),
+        radial-gradient(circle, rgba(255, 255, 255, 0.025) 10%, transparent 60%);
+    opacity: 0.85;
+    pointer-events: none;
+}
+/* Visual gold path logic lines */
+.pcb-board::after {
+    content: '';
+    position: absolute;
+    top: 15%;
+    bottom: 15%;
+    left: 20%;
+    right: 20%;
+    border: 1px solid rgba(207, 181, 59, 0.08);
+    pointer-events: none;
+    border-radius: 10px;
+    z-index: 2;
+    animation: pcb-pulse 4s infinite ease-in-out;
+}
+@keyframes pcb-pulse {
+    0%, 100% { border-color: rgba(207, 181, 59, 0.06); filter: drop-shadow(0 0 0 transparent); }
+    50% { border-color: rgba(207, 181, 59, 0.22); filter: drop-shadow(0 0 3px rgba(207, 181, 59, 0.3)); }
+}
+
+/* Glowing Backlit character LCD Module */
+.lcd-module {
+    width: 250px;
+    height: 70px;
+    background: #0f2d19;
+    border: 3px solid #142217;
+    border-radius: 8px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 
+        0 8px 20px rgba(0,0,0,0.65), 
+        inset 0 0 10px rgba(0,0,0,0.5);
+    padding: 6px;
+    z-index: 10;
+}
+
+.lcd-screen {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    border-radius: 4px;
+    box-shadow: 
+        inset 0 2px 6px rgba(0,0,0,0.8), 
+        0 0 15px rgba(16, 185, 129, 0.35);
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-family: var(--font-instrument);
+    font-weight: 800;
+    color: #022c22;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.25);
+    user-select: none;
+    overflow: hidden;
+}
+
+.lcd-line {
+    font-size: 0.72rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+.lcd-line-1 {
+    border-bottom: 1px dashed rgba(2, 44, 34, 0.15);
+    padding-bottom: 2px;
+}
+.lcd-line-2 {
+    color: #064e3b;
+    font-size: 0.65rem;
+    margin-top: 2px;
+}
+
+.lcd-screws .screw {
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle, #777 0%, #444 100%);
+    border-radius: 50%;
+    position: absolute;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.35);
+}
+.lcd-screws .screw::before {
+    content: '';
+    width: 4px;
+    height: 1px;
+    background: #222;
+    position: absolute;
+    top: 2.5px;
+    left: 1px;
+    transform: rotate(45deg);
+}
+
+/* Status LEDs with glowing halos */
+.pcb-leds-panel {
+    display: flex;
+    gap: 0.55rem;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+.pcb-led-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+}
+.pcb-led-lbl {
+    font-family: var(--font-sans);
+    font-size: 0.48rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.8);
+}
+.pcb-led {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #181c19;
+    border: 1px solid #080a09;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+    transition: all var(--transition-speed);
+}
+.pcb-led.led-green.active {
+    background: #00ff66;
+    box-shadow: 0 0 12px #00ff66, inset 0 1px 1px rgba(255,255,255,0.4);
+}
+.pcb-led.led-amber.active {
+    background: #ffaa00;
+    box-shadow: 0 0 12px #ffaa00, inset 0 1px 1px rgba(255,255,255,0.4);
+}
+.pcb-led.led-red.active {
+    background: #ff3300;
+    box-shadow: 0 0 12px #ff3300, inset 0 1px 1px rgba(255,255,255,0.4);
+}
+.pcb-led.led-cyan.active {
+    background: #00e5ff;
+    box-shadow: 0 0 12px #00e5ff, inset 0 1px 1px rgba(255,255,255,0.4);
+}
+
+.silk-labels .silk-lbl {
+    font-family: var(--font-sans);
+    font-size: 0.44rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.35);
+    position: absolute;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+
+/* Beautiful CSS Electronic Components */
+.pcb-components {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* 3D Microchips */
+.chip {
+    background: linear-gradient(to right, #18191f 0%, #31333b 50%, #18191f 100%);
+    border-radius: 2px;
+    border: 1px solid #0c0d10;
+    position: absolute;
+    box-shadow: 
+        0 6px 12px rgba(0,0,0,0.65), 
+        inset 0 1px 1px rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chip-text {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.32);
+    letter-spacing: 0.3px;
+    pointer-events: none;
+    text-transform: uppercase;
+}
+
+.chip-notch-top::before {
+    content: '';
+    width: 10px;
+    height: 5px;
+    background: #08090b;
+    border-radius: 0 0 5px 5px;
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.chip-notch-left::before {
+    content: '';
+    width: 5px;
+    height: 10px;
+    background: #08090b;
+    border-radius: 0 5px 5px 0;
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* IC chip leads */
+.chip-pins-left-right::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: -3px;
+    right: -3px;
+    background: repeating-linear-gradient(
+        to bottom,
+        #718096 0px,
+        #718096 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    z-index: -1;
+}
+.chip-pins-top-bottom::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: -3px;
+    bottom: -3px;
+    background: repeating-linear-gradient(
+        to right,
+        #718096 0px,
+        #718096 2px,
+        transparent 2px,
+        transparent 6px
+    );
+    z-index: -1;
+}
+
+/* Socket frames */
+.header-socket {
+    background: #0a0b0d;
+    border: 1px solid #1c1d22;
+    box-shadow: 0 1.5px 3px rgba(0,0,0,0.5);
+    position: absolute;
+}
+.silk-outline {
+    position: absolute;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    pointer-events: none;
+}
+
+.socket-pins::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    right: 2px;
+    background-image: radial-gradient(circle, #000 30%, #555 80%);
+    background-size: 6px 6px;
+}
+
+/* Horizontal Cylindrical Capacitor */
+.cap-cylindrical {
+    background: radial-gradient(ellipse at center, #1d4ed8 0%, #1e3a8a 100%);
+    border-radius: 6px;
+    border: 1.5px solid #0a0c10;
+    position: absolute;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cap-stripe {
+    width: 6px;
+    height: 100%;
+    background: #cbd5e1;
+    position: absolute;
+    right: 3px;
+    opacity: 0.8;
+}
+.cap-labels {
+    font-family: var(--font-sans);
+    font-size: 0.38rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.7);
+    transform: rotate(-90deg);
+}
+
+/* Quartz Crystal Oscillator */
+.xtal-oscillator {
+    width: 25px;
+    height: 14px;
+    background: linear-gradient(135deg, #cbd5e1 0%, #64748b 100%);
+    border-radius: 6px;
+    border: 1px solid #475569;
+    position: absolute;
+    font-family: var(--font-sans);
+    font-size: 0.35rem;
+    font-weight: 800;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 3px 6px rgba(0,0,0,0.5), 
+        inset 0 1px 0 rgba(255,255,255,0.4);
+}
+
+.black-port {
+    background: #0f1115;
+    border: 2px solid #2d3139;
+    position: absolute;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+}
+.port-circular {
+    border-radius: 50%;
+}
+.port-inner-pin {
+    width: 6px;
+    height: 6px;
+    background: #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.05);
+}
+
+/* Passive resistors */
+.resistor {
+    width: 18px;
+    height: 6px;
+    background: #e2b484;
+    border-radius: 2px;
+    position: absolute;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.resistor::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, 
+        transparent 3px, 
+        #dc2626 3px, #dc2626 5px, 
+        transparent 5px, transparent 8px,
+        #fbbf24 8px, #fbbf24 10px,
+        transparent 10px, transparent 13px,
+        #16a34a 13px, #16a34a 15px,
+        transparent 15px
+    );
+}
+
+/* Tactile switches on-board */
+.pcb-buttons {
+    display: flex;
+    gap: 1.2rem;
+    position: absolute;
+    bottom: 12px;
+    right: 25px;
+    z-index: 10;
+}
+.pcb-tactile-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+.pcb-tactile-btn:active .tactile-cap,
+.pcb-tactile-btn.pressed .tactile-cap {
+    transform: scale(0.85);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+}
+.tactile-cap {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #111;
+    border: 2px solid #444;
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.55);
+    transition: transform var(--transition-speed);
+}
+.tactile-cap::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    background: #000;
+    border: 1px solid #222;
+    border-radius: 2px;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.05);
+}
+.red-cap {
+    background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+    border-color: #f87171;
+}
+.black-cap {
+    background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);
+    border-color: #6b7280;
+}
+.tactile-lbl {
+    font-family: var(--font-sans);
+    font-size: 0.46rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+/* PREMIUM 3D NEUMORPHIC DOME COMMAND CONSOLE */
+.neumorphic-console-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.45rem;
+    padding: 0.75rem;
+    background: var(--bg-workbench);
+    border-radius: 18px;
+    box-shadow: var(--shadow-inset);
+    margin-bottom: 0.85rem;
+}
+
+.console-btn {
+    flex: 1;
+    background: linear-gradient(135deg, #161c28, #0e121a);
+    border: 1px solid rgba(255,255,255,0.015);
+    border-radius: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.6rem 0.15rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-btn-convex);
+    transition: all 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+    user-select: none;
+    outline: none;
+}
+.console-btn kbd {
+    background: rgba(4, 5, 8, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 4px;
+    color: var(--text-dark);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    padding: 1px 4px;
+    pointer-events: none;
+}
+.console-btn .btn-cap {
+    pointer-events: none;
+}
+.console-btn:hover {
+    color: var(--text-main);
+    transform: translateY(-1px);
+}
+
+/* Button Active pressed simulation feel */
+.console-btn:active, 
+.console-btn.pressed {
+    box-shadow: var(--shadow-btn-inset) !important;
+    transform: translateY(1.5px) scale(0.96);
+    color: var(--text-main);
+}
+
+/* Vibrant customized Glowing colors for Command Console keys */
+.console-btn.btn-reset:hover {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.45), var(--shadow-btn-convex);
+    color: #ef4444;
+}
+.console-btn.btn-reset:active, 
+.console-btn.btn-reset.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(239, 68, 68, 0.45) !important;
+    color: #ef4444;
+}
+
+.console-btn.btn-exmem:hover {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.45), var(--shadow-btn-convex);
+    color: #818cf8;
+}
+.console-btn.btn-exmem:active, 
+.console-btn.btn-exmem.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(99, 102, 241, 0.45) !important;
+    color: #818cf8;
+}
+
+.console-btn.btn-data:hover {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.45), var(--shadow-btn-convex);
+    color: #22d3ee;
+}
+.console-btn.btn-data:active, 
+.console-btn.btn-data.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(6, 182, 212, 0.45) !important;
+    color: #22d3ee;
+}
+
+.console-btn.btn-exreg:hover {
+    box-shadow: 0 0 15px rgba(20, 184, 166, 0.45), var(--shadow-btn-convex);
+    color: #2dd4bf;
+}
+.console-btn.btn-exreg:active, 
+.console-btn.btn-exreg.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(20, 184, 166, 0.45) !important;
+    color: #2dd4bf;
+}
+
+.console-btn.btn-nav:hover {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.18), var(--shadow-btn-convex);
+    color: #ffffff;
+}
+.console-btn.btn-nav:active, 
+.console-btn.btn-nav.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff;
+}
+
+.console-btn.btn-step:hover {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.45), var(--shadow-btn-convex);
+    color: #fbbf24;
+}
+.console-btn.btn-step:active, 
+.console-btn.btn-step.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(245, 158, 11, 0.45) !important;
+    color: #fbbf24;
+}
+
+.console-btn.btn-go:hover {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.45), var(--shadow-btn-convex);
+    color: #34d399;
+}
+.console-btn.btn-go:active, 
+.console-btn.btn-go.pressed {
+    box-shadow: inset 3px 3px 6px #030406, 0 0 10px rgba(16, 185, 129, 0.45) !important;
+    color: #34d399;
+}
+
+/* Workbench Keyboard Interface Guide */
+.workbench-guide {
+    background: rgba(4, 5, 8, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 0.85rem;
+    box-shadow: var(--shadow-inset);
+}
+.guide-header {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.8px;
+    margin-bottom: 0.65rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.35rem;
+}
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .guide-grid {
+        grid-template-columns: 1fr;
+    }
+    .neumorphic-console-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.4rem;
+    }
+}
+
+.guide-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+.guide-item kbd {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 5px;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    padding: 2px 5px;
+    font-size: 0.62rem;
+    box-shadow: 0 1.5px 3px rgba(0,0,0,0.5);
+    min-width: 20px;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.65; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.toast {
+    background: rgba(11, 14, 20, 0.95);
+    backdrop-filter: blur(var(--blur-strength));
+    border-left: 4px solid var(--primary);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+    color: var(--text-main);
+    padding: 0.85rem 1.35rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.65);
+    animation: slideIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warn { border-left-color: var(--warning); }
+
+@keyframes slideIn {
+    from { transform: translateX(100px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* ==========================================================================
+   RESPONSIVE CSS OVERHAUL — Prince 8085 Simulator
+   Comprehensive cross-device support: 375px → 4K Ultra-wide
+   All rules APPENDED — no existing rules modified.
+   Breakpoint order: largest → smallest
+   ========================================================================== */
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §15. BUS TRAFFIC ANIMATION (new keyframe + executing state)
+   ────────────────────────────────────────────────────────────────────────── */
+
+@keyframes bus-traffic {
+    0%   { background-position: 0 0; }
+    100% { background-position: 30px 30px; }
+}
+.pcb-board.executing .pcb-tracks {
+    animation: bus-traffic 2s linear infinite;
+    opacity: 1;
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §18. ULTRA-WIDE SUPPORT (≥ 1920px)
+   Subtle readability boost for large monitors / 4K displays.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (min-width: 1920px) {
+    body {
+        font-size: 1.05rem;
+    }
+
+    main {
+        max-width: 1800px;
+        margin: 0 auto;
+    }
+
+    .card-body {
+        font-size: 1.02rem;
+    }
+
+    .code-textarea {
+        font-size: 0.92rem;
+    }
+
+    .register-value {
+        font-size: 1.7rem;
+    }
+
+    .console-btn {
+        font-size: 0.78rem;
+        padding: 0.7rem 0.25rem;
+    }
+
+    .tab-btn {
+        font-size: 0.92rem;
+        padding: 0.85rem 1.6rem;
+    }
+
+    .memory-table {
+        font-size: 0.85rem;
+    }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §1–3. HEADER, MAIN GRID, PCB BOARD  (≤ 1024px)
+   Single-column layout, reduced padding.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+    main {
+        padding: 0.75rem;
+    }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §1, §2, §3, §6, §7, §8, §9, §16, §17  (≤ 768px)
+   Tablet / landscape-phone tier.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+
+    /* §1 — Header stacking */
+    header {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem 1rem;
+        text-align: center;
+    }
+
+    .logo-container {
+        justify-content: center;
+    }
+
+    .logo-text h1 {
+        font-size: 1.1rem;
+    }
+
+    .logo-text p {
+        font-size: 0.62rem;
+    }
+
+    .cpu-status-badge {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.68rem;
+        gap: 0.45rem;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    /* §2 — Main grid gap reduction */
+    main {
+        gap: 0.75rem;
+    }
+
+    /* §3 — PCB board transform-origin for JS scaling */
+    .pcb-container {
+        overflow: visible;
+        position: relative;
+    }
+
+    .pcb-board {
+        transform-origin: top center;
+    }
+
+    /* §5 — Console bar grid layout */
+    .neumorphic-console-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.4rem;
+        padding: 0.6rem;
+    }
+
+    /* §7 — Editor height reduction */
+    .editor-container {
+        min-height: 280px;
+    }
+
+    /* §9 — Card padding reduction */
+    .card-body {
+        padding: 0.85rem;
+        gap: 0.85rem;
+    }
+
+    .card-header {
+        padding: 0.85rem 1rem;
+    }
+
+    .card-header h2 {
+        font-size: 0.95rem;
+        gap: 0.45rem;
+    }
+
+    /* §16 — Ambient glow mobile reduction (40% smaller, lower opacity) */
+    .glow-1 {
+        width: 300px;
+        height: 300px;
+        opacity: 0.06;
+    }
+
+    .glow-2 {
+        width: 360px;
+        height: 360px;
+        opacity: 0.06;
+    }
+
+    .glow-3 {
+        width: 240px;
+        height: 240px;
+        opacity: 0.06;
+    }
+
+    /* §17 — Scrollbar mobile refinement */
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §4, §6, §8, §10, §11  (≤ 600px)
+   Small-tablet / large-phone threshold.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+
+    /* §6 — Register grid collapse → single column */
+    .registers-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* §6 — Flags row reduce padding but keep 5-col */
+    .flags-row {
+        gap: 0.35rem;
+    }
+
+    .flag-box {
+        padding: 0.45rem 0.3rem;
+    }
+
+    .flag-name {
+        font-size: 0.65rem;
+    }
+
+    .flag-bit {
+        font-size: 0.82rem;
+    }
+
+    .flag-lbl {
+        font-size: 0.46rem;
+    }
+
+    /* §6 — Flow grid → single column */
+    .flow-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* §8 — Memory table horizontal scroll */
+    .memory-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .memory-table {
+        min-width: 400px;
+    }
+
+    /* §10 — Toast full-width on mobile */
+    .toast-container {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .toast {
+        padding: 0.6rem 0.9rem;
+        font-size: 0.74rem;
+        gap: 0.5rem;
+    }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §3–§14  (≤ 480px)
+   Standard smartphone portrait. Most aggressive optimizations.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+
+    /* §1 — Header further compact */
+    header {
+        padding: 0.5rem 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .logo-text h1 {
+        font-size: 0.95rem;
+    }
+
+    .logo-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.95rem;
+        border-radius: 9px;
+    }
+
+    .cpu-status-badge {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.62rem;
+    }
+
+    /* §2 — Main grid tighter */
+    main {
+        padding: 0.5rem;
+        gap: 0.55rem;
+    }
+
+    /* §3 — PCB board small-screen transform-origin */
+    .pcb-board {
+        transform-origin: top left;
+        max-width: 100%;
+    }
+
+    .pcb-container {
+        overflow: hidden;
+        padding: 0.6rem 0;
+    }
+
+    /* §4 — LCD display overflow fix */
+    .lcd-line {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.6rem;
+    }
+
+    .lcd-line-2 {
+        font-size: 0.54rem;
+    }
+
+    /* §5 — Console bar 3-column grid */
+    .neumorphic-console-bar {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.3rem;
+        padding: 0.5rem;
+        border-radius: 14px;
+    }
+
+    .console-btn {
+        font-size: 0.6rem;
+        padding: 0.45rem 0.1rem;
+        border-radius: 10px;
+        gap: 0.15rem;
+    }
+
+    .console-btn kbd {
+        font-size: 0.48rem;
+        padding: 1px 3px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        white-space: nowrap;
+    }
+
+    /* §7 — Editor height + font-size for mobile */
+    .editor-container {
+        min-height: 220px;
+        border-radius: 10px;
+    }
+
+    .code-textarea {
+        font-size: 0.78rem;
+        padding: 0.75rem;
+    }
+
+    .line-numbers {
+        font-size: 0.72rem;
+        padding: 0.75rem 0.4rem;
+        min-width: 36px;
+    }
+
+    /* §9 — Card padding aggressive reduction */
+    .card-body {
+        padding: 0.65rem;
+        gap: 0.65rem;
+    }
+
+    .card {
+        border-radius: 14px;
+    }
+
+    .card-header {
+        padding: 0.7rem 0.8rem;
+    }
+
+    .card-header h2 {
+        font-size: 0.88rem;
+    }
+
+    /* §11 — Workbench guide font-size reduction */
+    .guide-item {
+        font-size: 0.6rem;
+        gap: 0.4rem;
+    }
+
+    .guide-item kbd {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+        min-width: 18px;
+    }
+
+    .guide-header {
+        font-size: 0.65rem;
+        margin-bottom: 0.45rem;
+    }
+
+    .workbench-guide {
+        padding: 0.6rem;
+        border-radius: 10px;
+    }
+
+    /* §12 — Tab buttons compact */
+    .tab-btn {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.75rem;
+    }
+
+    /* §13 — Editor actions flex-wrap */
+    .editor-actions {
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .btn {
+        padding: 0.58rem 0.75rem;
+        font-size: 0.75rem;
+        gap: 0.4rem;
+    }
+
+    /* §14 — Presets select compact */
+    .presets-select {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.7rem;
+    }
+
+    .presets-label {
+        font-size: 0.65rem;
+    }
+
+    /* Console box smaller on mobile */
+    .console-box {
+        height: 95px;
+        font-size: 0.68rem;
+        padding: 0.6rem;
+        border-radius: 9px;
+    }
+
+    /* Register card compact */
+    .register-card {
+        padding: 0.65rem 0.85rem;
+        border-radius: 12px;
+    }
+
+    .register-name {
+        font-size: 0.7rem;
+    }
+
+    .register-desc {
+        font-size: 0.54rem;
+    }
+
+    .register-value {
+        font-size: 1.3rem;
+    }
+
+    .register-bin {
+        font-size: 0.56rem;
+    }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   §6  (≤ 400px)
+   Very narrow phones — flags row wraps to 3-column.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 400px) {
+
+    .flags-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .flag-box {
+        padding: 0.4rem 0.2rem;
+    }
+
+    .flag-name {
+        font-size: 0.6rem;
+    }
+
+    .flag-bit {
+        font-size: 0.78rem;
+    }
+
+    /* Extra-tight card spacing for 375px-class devices */
+    .card-body {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    main {
+        padding: 0.35rem;
+        gap: 0.45rem;
+    }
+
+    /* Header micro-compact */
+    .logo-text h1 {
+        font-size: 0.85rem;
+    }
+
+    .logo-text p {
+        font-size: 0.55rem;
+    }
+
+    .logo-icon {
+        width: 26px;
+        height: 26px;
+        font-size: 0.85rem;
+        border-radius: 8px;
+    }
+
+    /* Console buttons 3-col even tighter */
+    .console-btn {
+        font-size: 0.55rem;
+        padding: 0.38rem 0.08rem;
+        border-radius: 8px;
+    }
+
+    .console-btn kbd {
+        font-size: 0.44rem;
+    }
+
+    /* Tab buttons smallest */
+    .tab-btn {
+        padding: 0.5rem 0.55rem;
+        font-size: 0.68rem;
+    }
+
+    /* Editor actions stacked on very narrow screens */
+    .editor-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 0.55rem 0.6rem;
+        font-size: 0.72rem;
+    }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   SAFE LCD OVERFLOW DEFAULTS (all sizes)
+   Ensure LCD text never causes horizontal blowout.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.lcd-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────────
+   PCB TRANSFORM-ORIGIN DEFAULTS (all sizes)
+   Required for JS-driven transform:scale() to anchor correctly.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.pcb-container {
+    overflow: visible;
+    position: relative;
+}
+
+.pcb-board {
+    transform-origin: top center;
+}
+
+/* ==========================================================================
+   TRAINER KIT TEXT OPTIMIZATION & FULLSCREEN MODE
+   ========================================================================== */
+
+/* Trainer Toolbar — sits above the PCB board */
+.trainer-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.trainer-toolbar-hint {
+    font-size: 0.72rem;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.2px;
+}
+
+.fullscreen-btn {
+    flex: 0 !important;
+    white-space: nowrap;
+    padding: 0.45rem 0.85rem !important;
+    border-radius: 10px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    gap: 0.4rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.2s ease !important;
+}
+.fullscreen-btn:hover {
+    background: rgba(99, 102, 241, 0.15) !important;
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+    box-shadow: 0 0 12px var(--primary-glow) !important;
+}
+
+/* ── PCB Silk Label Optimization ── */
+.silk-labels .silk-lbl {
+    font-family: var(--font-sans);
+    font-size: 0.48rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* ── Chip Label Readability ── */
+.chip-text {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.4px;
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.9);
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* ── PCB Title & Sub-title readability ── */
+.pcb-title {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 6px rgba(20, 160, 80, 0.2);
+    letter-spacing: 0.8px;
+}
+
+.pcb-sub-title {
+    font-size: 0.48rem;
+    color: rgba(255, 255, 255, 0.55);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    letter-spacing: 1.2px;
+}
+
+/* ── LCD Text Optimization ── */
+.lcd-screen {
+    letter-spacing: 0.3px;
+}
+
+.lcd-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.45;
+}
+
+.lcd-line-1 {
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.lcd-line-2 {
+    font-size: 0.62rem;
+    font-weight: 700;
+}
+
+/* ── LED Label Text ── */
+.pcb-led-lbl {
+    font-size: 0.46rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Console Button Text Optimization ── */
+.console-btn .btn-cap {
+    font-size: inherit;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* ── Tactile Button Labels on PCB ── */
+.tactile-lbl {
+    font-size: 0.44rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.7);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   FULLSCREEN MODE — Immersive Trainer Board Experience
+   ========================================================================== */
+
+/* The fullscreen overlay container */
+.trainer-fullscreen-active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    background: var(--bg-dark) !important;
+    border-radius: 0 !important;
+    border: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+/* In fullscreen, hide card header and tabs — go straight to trainer content */
+.trainer-fullscreen-active .tabs-header {
+    display: none !important;
+}
+
+/* Card body fills the viewport */
+.trainer-fullscreen-active > .card-body {
+    flex: 1 !important;
+    padding: 1.5rem 2rem !important;
+    overflow-y: auto !important;
+    max-height: 100vh !important;
+}
+
+/* Memory tab hidden in fullscreen */
+.trainer-fullscreen-active #memory-tab {
+    display: none !important;
+}
+
+/* Force trainer tab visible in fullscreen */
+.trainer-fullscreen-active #trainer-tab {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.1rem !important;
+    flex: 1 !important;
+}
+
+/* PCB board scales up nicely in fullscreen */
+.trainer-fullscreen-active .pcb-board {
+    max-width: 560px;
+    height: 350px;
+}
+
+.trainer-fullscreen-active .pcb-container {
+    padding: 1.5rem 0;
+}
+
+/* Console bar has breathing room */
+.trainer-fullscreen-active .neumorphic-console-bar {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Fullscreen button becomes an exit button */
+.trainer-fullscreen-active .fullscreen-btn {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #f87171 !important;
+}
+.trainer-fullscreen-active .fullscreen-btn:hover {
+    background: rgba(239, 68, 68, 0.25) !important;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Toolbar sticks to top in fullscreen */
+.trainer-fullscreen-active .trainer-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg-dark);
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.75rem;
+}
+
+/* ── Fullscreen Mobile Overrides ── */
+@media (max-width: 768px) {
+    .trainer-toolbar {
+        flex-direction: column;
+        gap: 0.4rem;
+        align-items: stretch;
+    }
+    .trainer-toolbar-hint {
+        font-size: 0.62rem;
+        text-align: center;
+    }
+    .fullscreen-btn {
+        align-self: center;
+    }
+    
+    .trainer-fullscreen-active > .card-body {
+        padding: 0.75rem !important;
+    }
+    
+    .trainer-fullscreen-active .pcb-board {
+        max-width: 460px;
+        height: 290px;
+    }
+}
+
+@media (max-width: 480px) {
+    .trainer-toolbar-hint {
+        font-size: 0.56rem;
+    }
+    .fullscreen-btn {
+        font-size: 0.68rem !important;
+        padding: 0.38rem 0.65rem !important;
+    }
+}
+
+/* ==========================================
+   NAVIGATION, HELP MODAL, AND SITE FOOTER
+   ========================================== */
+
+/* Navigation Links in Header */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin: 0 auto 0 2.5rem;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    background: transparent;
+    font-family: var(--font-heading);
+}
+
+.nav-link:hover {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.nav-link.active {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.05);
+}
+
+/* Nav Help button specifically */
+.nav-help-btn {
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    background: rgba(167, 139, 250, 0.05);
+    color: var(--accent);
+}
+
+.nav-help-btn:hover {
+    color: #ffffff;
+    background: rgba(167, 139, 250, 0.15);
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(167, 139, 250, 0.15);
+}
+
+/* Mobile Nav Toggle */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 22px;
+    height: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 101;
+}
+
+.nav-toggle span {
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-muted);
+    border-radius: 2px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Help Modal Overlay */
+.help-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 5, 8, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.help-modal-overlay.open {
+    display: flex;
+    opacity: 1;
+}
+
+.help-modal {
+    background: linear-gradient(145deg, #0d111a, #07090e);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 85vh;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalScaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalScaleUp {
+    from {
+        transform: scale(0.9) translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.help-modal-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.help-modal-header h2 {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff, #c7d2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.help-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.75rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.help-close-btn:hover {
+    color: #ffffff;
+}
+
+.help-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    scrollbar-width: thin;
+}
+
+.help-section h3 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.help-section p, .help-section li {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.help-section ul, .help-section ol {
+    padding-left: 1.25rem;
+    margin: 0.5rem 0;
+}
+
+.help-section li {
+    margin-bottom: 0.4rem;
+}
+
+.help-section kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.72rem;
+    color: #ffffff;
+    font-family: var(--font-mono);
+}
+
+.help-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+}
+
+.help-table th, .help-table td {
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.help-table th {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.help-table td {
+    color: var(--text-muted);
+}
+
+.help-table tr:hover td {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+/* Site Footer */
+.site-footer {
+    background: rgba(7, 9, 14, 0.9);
+    border-top: 1px solid var(--border-color);
+    padding: 1.25rem 2.5rem;
+    margin-top: 3rem;
+    width: 100%;
+    z-index: 10;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.footer-left, .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.footer-brand {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: -0.2px;
+}
+
+.footer-sep {
+    color: var(--border-color);
+    font-size: 0.8rem;
+}
+
+.footer-desc, .footer-copy {
+    font-size: 0.75rem;
+    color: var(--text-dark);
+}
+
+.footer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.footer-link:hover {
+    color: var(--primary);
+}
+
+/* Responsive navigation adjustments */
+@media (max-width: 900px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: rgba(7, 9, 14, 0.98);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.5rem 2rem;
+        gap: 1rem;
+        margin: 0;
+        z-index: 99;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .nav-links.open {
+        display: flex;
+    }
+    
+    .nav-link {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem;
+    }
+    
+    .nav-toggle {
+        display: flex;
+    }
+}
+

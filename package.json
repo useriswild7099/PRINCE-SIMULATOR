@@ -1,0 +1,15 @@
+{
+  "name": "prince-simulator",
+  "version": "2.1.0",
+  "description": "Prince 8085 Microprocessor Simulator — because the real kit is always broken",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . -l 3000",
+    "lint": "node -c simulator.js"
+  },
+  "keywords": ["8085", "microprocessor", "simulator", "assembly", "emulator"],
+  "author": "Prince",
+  "license": "MIT",
+  "private": false
+}
