@@ -2656,3 +2656,14 @@ main {
     margin-bottom: 5px;
 }
 
+/* LCD Blinking Cursor Animation for Authentic Trainer Kit feeling */
+@keyframes lcd-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.15; }
+}
+.lcd-blink {
+    animation: lcd-flash 0.8s steps(1, start) infinite;
+    font-weight: 800;
+}
+
+

@@ -1320,28 +1320,60 @@ function setExecutionSpeed(val) {
 
 // --- Virtual Trainer Kit Board UI Logic ---
 // --- Virtual Trainer Kit Board UI Logic ---
-let trainerMode = 'ADDR'; // ADDR, DATA, REG, GO_ADDR
+let trainerMode = 'BOOT'; // BOOT, ADDR, DATA, REG, GO_ADDR
 let trainerCurrentAddr = 0x2000;
 let trainerSelectedReg = 'A'; // A, B, C, D, E, H, L, F
 let inputBuffer = '';
 
 function updateTrainerDisplay() {
-    const addrDisp = document.getElementById('lcd-addr');
-    const dataDisp = document.getElementById('lcd-data');
-    const statusDisp = document.getElementById('lcd-status');
-    if (!addrDisp || !dataDisp || !statusDisp) return;
+    const line1 = document.getElementById('lcd-line-1');
+    const line2 = document.getElementById('lcd-line-2');
+    if (!line1 || !line2) return;
     
-    // Address displays
-    addrDisp.innerText = trainerCurrentAddr.toString(16).toUpperCase().padStart(4, '0') + 'H';
+    if (trainerMode === 'BOOT') {
+        line1.innerHTML = 'PRINCE-8085';
+        line2.innerHTML = 'SYSTEM READY';
+        return;
+    }
     
     if (trainerMode === 'ADDR') {
-        dataDisp.innerText = '--';
-        statusDisp.innerText = 'MODE: ADDRESS ENTRY';
+        // Format address with dynamic blinking placeholders
+        let addrStr = '';
+        for (let i = 0; i < 4; i++) {
+            if (i < inputBuffer.length) {
+                addrStr += inputBuffer[i];
+            } else if (i === inputBuffer.length) {
+                addrStr += '<span class="lcd-blink">_</span>';
+            } else {
+                addrStr += '_';
+            }
+        }
+        line1.innerHTML = `ADR: ${addrStr}  DAT: --`;
+        line2.innerHTML = 'MODE: ADDRESS ENTRY';
     } 
     else if (trainerMode === 'DATA') {
-        let val = cpu.memory[trainerCurrentAddr];
-        dataDisp.innerText = val.toString(16).toUpperCase().padStart(2, '0') + 'H';
-        statusDisp.innerText = 'MODE: DATA EDIT (CELL)';
+        // Display current address
+        let addrStr = trainerCurrentAddr.toString(16).toUpperCase().padStart(4, '0');
+        
+        // Format data with placeholders if typing, or current memory value if empty
+        let dataStr = '';
+        if (inputBuffer.length === 0) {
+            let val = cpu.memory[trainerCurrentAddr];
+            dataStr = val.toString(16).toUpperCase().padStart(2, '0');
+        } else {
+            for (let i = 0; i < 2; i++) {
+                if (i < inputBuffer.length) {
+                    dataStr += inputBuffer[i];
+                } else if (i === inputBuffer.length) {
+                    dataStr += '<span class="lcd-blink">_</span>';
+                } else {
+                    dataStr += '_';
+                }
+            }
+        }
+        
+        line1.innerHTML = `ADR: ${addrStr}  DAT: ${dataStr}H`;
+        line2.innerHTML = 'MODE: DATA EDIT (CELL)';
     } 
     else if (trainerMode === 'REG') {
         let val = 0;
@@ -1355,12 +1387,28 @@ function updateTrainerDisplay() {
         else if (trainerSelectedReg === 'F') {
             val = (cpu.f.s << 7) | (cpu.f.z << 6) | (cpu.f.ac << 4) | (cpu.f.p << 2) | cpu.f.cy;
         }
-        dataDisp.innerText = val.toString(16).toUpperCase().padStart(2, '0') + 'H';
-        statusDisp.innerText = `REG EXAMINE: rE-${trainerSelectedReg}`;
+        let dataStr = val.toString(16).toUpperCase().padStart(2, '0');
+        
+        line1.innerHTML = `REG: ${trainerSelectedReg}  VAL: ${dataStr}H`;
+        line2.innerHTML = `REG EXAMINE: rE-${trainerSelectedReg}`;
     } 
     else if (trainerMode === 'GO_ADDR') {
-        dataDisp.innerText = 'Ad';
-        statusDisp.innerText = `EXECUTE AT ${trainerCurrentAddr.toString(16).toUpperCase().padStart(4, '0')}H?`;
+        // Format address with dynamic blinking placeholders for execution address entry
+        let addrStr = '';
+        for (let i = 0; i < 4; i++) {
+            if (i < inputBuffer.length) {
+                addrStr += inputBuffer[i];
+            } else if (i === inputBuffer.length) {
+                addrStr += '<span class="lcd-blink">_</span>';
+            } else {
+                addrStr += '_';
+            }
+        }
+        
+        line1.innerHTML = `GO: ${addrStr}  DAT: Ad`;
+        let targetAddr = inputBuffer.length > 0 ? parseInt(inputBuffer, 16) : trainerCurrentAddr;
+        let targetStr = targetAddr.toString(16).toUpperCase().padStart(4, '0');
+        line2.innerHTML = `EXECUTE AT ${targetStr}H?`;
     }
 }
 
@@ -1462,13 +1510,21 @@ function onTrainerKey(key) {
     // 1. Hardware Reset Key
     if (key === 'RESET') {
         resetCpu();
-        trainerMode = 'ADDR';
+        trainerMode = 'BOOT';
         trainerCurrentAddr = 0x2000;
         inputBuffer = '';
         updateTrainerDisplay();
         showToast("Trainer Board: System Hardware Reset", "success");
         addLog("Hardware Reset triggered from Trainer Board.", "warn");
         return;
+    }
+    
+    // Lock keypads in BOOT mode except for transition commands
+    if (trainerMode === 'BOOT') {
+        if (!['RESET', 'EXMEM', 'DATA_REG', 'EXREG', 'GO', 'STEP'].includes(key)) {
+            showToast("Select mode first (press EXMEM or EXREG)", "warn");
+            return;
+        }
     }
     
     // 2. Command Keys
