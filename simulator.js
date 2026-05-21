@@ -1324,6 +1324,8 @@ let trainerMode = 'BOOT'; // BOOT, ADDR, DATA, REG, GO_ADDR
 let trainerCurrentAddr = 0x2000;
 let trainerSelectedReg = 'A'; // A, B, C, D, E, H, L, F
 let inputBuffer = '';
+let justAutoAdvanced = false;
+let autoAdvanceTimeout = null;
 
 function updateTrainerDisplay() {
     const line1 = document.getElementById('lcd-line-1');
@@ -1509,6 +1511,11 @@ function onTrainerKey(key) {
     
     // 1. Hardware Reset Key
     if (key === 'RESET') {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
         resetCpu();
         trainerMode = 'BOOT';
         trainerCurrentAddr = 0x2000;
@@ -1529,6 +1536,11 @@ function onTrainerKey(key) {
     
     // 2. Command Keys
     if (key === 'EXMEM') {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
         trainerMode = 'ADDR';
         inputBuffer = '';
         updateTrainerDisplay();
@@ -1537,6 +1549,11 @@ function onTrainerKey(key) {
     }
     
     if (key === 'DATA_REG') {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
         trainerMode = 'DATA';
         inputBuffer = '';
         updateTrainerDisplay();
@@ -1545,6 +1562,11 @@ function onTrainerKey(key) {
     }
     
     if (key === 'EXREG') {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
         trainerMode = 'REG';
         trainerSelectedReg = 'A';
         inputBuffer = '';
@@ -1554,10 +1576,34 @@ function onTrainerKey(key) {
     }
     
     if (key === 'NEXT') {
-        if (trainerMode === 'DATA' || trainerMode === 'ADDR') {
-            trainerCurrentAddr = (trainerCurrentAddr + 1) & 0xFFFF;
-            trainerMode = 'DATA'; // Shift to data editing immediately on next
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        
+        if (trainerMode === 'ADDR') {
+            // First press in address entry mode transitions to editing data of that address without incrementing
+            trainerMode = 'DATA';
             inputBuffer = '';
+            justAutoAdvanced = false;
+        } else if (trainerMode === 'DATA') {
+            if (inputBuffer.length > 0) {
+                // If there's pending input, save it first, and advance
+                let byteVal = parseInt(inputBuffer, 16);
+                cpu.memory[trainerCurrentAddr] = byteVal;
+                trainerCurrentAddr = (trainerCurrentAddr + 1) & 0xFFFF;
+                inputBuffer = '';
+                justAutoAdvanced = false;
+            } else {
+                // If no input, but we just auto-advanced, consume the delimiter without double-advancing
+                if (justAutoAdvanced) {
+                    justAutoAdvanced = false;
+                    return;
+                }
+                // Otherwise increment as usual
+                trainerCurrentAddr = (trainerCurrentAddr + 1) & 0xFFFF;
+                inputBuffer = '';
+            }
         }
         updateTrainerDisplay();
         refreshMemoryTable();
@@ -1565,9 +1611,19 @@ function onTrainerKey(key) {
     }
     
     if (key === 'PREV') {
-        if (trainerMode === 'DATA' || trainerMode === 'ADDR') {
-            trainerCurrentAddr = (trainerCurrentAddr - 1) & 0xFFFF;
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
+        
+        if (trainerMode === 'ADDR') {
+            // First press in address entry transitions to editing data of that address without decrementing
             trainerMode = 'DATA';
+            inputBuffer = '';
+        } else if (trainerMode === 'DATA') {
+            // Subsequent presses decrement the address
+            trainerCurrentAddr = (trainerCurrentAddr - 1) & 0xFFFF;
             inputBuffer = '';
         }
         updateTrainerDisplay();
@@ -1576,6 +1632,11 @@ function onTrainerKey(key) {
     }
     
     if (key === 'GO') {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
         if (trainerMode !== 'GO_ADDR') {
             trainerMode = 'GO_ADDR';
             inputBuffer = '';
@@ -1593,6 +1654,11 @@ function onTrainerKey(key) {
     }
     
     if (key === 'STEP') {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        justAutoAdvanced = false;
         cpu.pc = trainerCurrentAddr;
         stepExecution();
         trainerCurrentAddr = cpu.pc;
@@ -1603,18 +1669,39 @@ function onTrainerKey(key) {
     
     // 3. Hex / Number Inputs (0-F)
     if (['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'].includes(key)) {
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        
         if (trainerMode === 'ADDR' || trainerMode === 'GO_ADDR') {
+            justAutoAdvanced = false;
             inputBuffer += key;
             if (inputBuffer.length > 4) inputBuffer = inputBuffer.slice(-4);
             trainerCurrentAddr = parseInt(inputBuffer, 16);
         } 
         else if (trainerMode === 'DATA') {
+            justAutoAdvanced = false;
             inputBuffer += key;
             if (inputBuffer.length > 2) inputBuffer = inputBuffer.slice(-2);
             let byteVal = parseInt(inputBuffer, 16);
             cpu.memory[trainerCurrentAddr] = byteVal;
+            
+            // Auto-advance after 150ms once 2 hex digits are entered
+            if (inputBuffer.length === 2) {
+                autoAdvanceTimeout = setTimeout(() => {
+                    if (trainerMode === 'DATA' && inputBuffer.length === 2) {
+                        trainerCurrentAddr = (trainerCurrentAddr + 1) & 0xFFFF;
+                        inputBuffer = '';
+                        justAutoAdvanced = true;
+                        updateTrainerDisplay();
+                        refreshMemoryTable();
+                    }
+                }, 150);
+            }
         } 
         else if (trainerMode === 'REG') {
+            justAutoAdvanced = false;
             // Map hex keypress to register selection in examine mode
             if (key === 'A') trainerSelectedReg = 'A';
             else if (key === 'B') trainerSelectedReg = 'B';
@@ -1676,10 +1763,15 @@ window.addEventListener('keydown', (event) => {
         event.preventDefault();
         onTrainerKey('EXREG');
     }
-    // GO: 'G' or ' ' (Space)
-    else if (key === 'G' || key === ' ') {
+    // GO: 'G' or ' ' (Space - only when not typing address/data to allow delimiter spacing)
+    else if (key === 'G' || (key === ' ' && trainerMode !== 'ADDR' && trainerMode !== 'DATA')) {
         event.preventDefault();
         onTrainerKey('GO');
+    }
+    // Delimiter keys: ',' (comma) or ' ' (space - only when typing address/data)
+    else if (key === ',' || (key === ' ' && (trainerMode === 'ADDR' || trainerMode === 'DATA'))) {
+        event.preventDefault();
+        onTrainerKey('NEXT');
     }
     // STEP: 'S' or 'T'
     else if (key === 'S' || key === 'T') {
